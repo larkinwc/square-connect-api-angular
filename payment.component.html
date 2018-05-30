@@ -1,0 +1,50 @@
+     <!-- link to the SqPaymentForm library -->
+
+   <!-- link to the local SqPaymentForm initialization -->
+
+ <div class="row no-gutters create-account">
+      <div class="col-3"></div>
+      <div class="col-6 card-box" id="card_1">  
+        <div class="middle"> 
+        <div id="sq-ccbox">
+        <h2>Payment Information</h2>
+ 
+        <form id="nonce-form" novalidate action="/v1/square/customer/createCard" method="post">
+          <div class="" id="billing">
+            <label for="address1">Address</label>
+            <input type="text" name="address1" id="address1" size="35" required><br>
+            <label for="address2">Address 2</label>
+            <input type="text" name="address2" id="address2"  size="35"><br>
+            <label for="address3">Address 3</label>
+            <input type="text" name="address3" id="address3"  size="35"><br>
+            <label for="city">City</label>
+            <input type="text" name="city" id="city"  size="35" required><br>
+            <label for="state">State</label>
+            <input type="text" name="state" id="state" size="35" required><br>
+            <label for="country">Country</label>
+            <input type="text" name="country" id="country"  size="35" required><br>
+          </div>
+
+          <h2>Pay with a Credit Card</h2>
+          <label for="sq-card-number">Card Number:</label>
+          <div id="sq-card-number"></div>
+          <label for="sq-cvv">CVV:</label>
+          <div id="sq-cvv"></div>
+          <label for="sq-expiration-date">Expiration Date:</label>
+          <div id="sq-expiration-date"></div>
+          <label for="sq-postal-code">Postal Code:</label>
+          <div id="sq-postal-code"></div>
+
+          <button id="sq-creditcard" class="btn-main button-credit-card" (click)="this.requestCardNonce($event)">Pay with card</button>
+        
+          <input type="hidden" id="sq-id" name="sq-id">
+          <input type="hidden" id="card-nonce" name="nonce">
+
+
+        </form>
+      </div>
+      </div>
+
+    </div>
+  </div>
+  
