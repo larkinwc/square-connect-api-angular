@@ -5,8 +5,6 @@ Square Connect Python client library to capture the information, and Angular for
 
 ## Requirements
 
-Make sure you have Python 2 >=2.79 or Python 3 >= 3.4.
-
 Tested with Angular 5.2+
 
 ## Setup
@@ -19,13 +17,9 @@ Tested with Angular 5.2+
 
 3. Replace of modify the form action so it will hit the API you are using to store the info returned from square. 
 
-### Install the Python client library
+### the Python client library example
 
-1. Make sure you have Python 2 >=2.79 or Python 3 >= 3.4 installed from [python.org](https://www.python.org/).
-
-2. Run the following command for install `squareconnect` package:
-
-        pip install squareconnect
+Checkout the original Python client library example at https://github.com/square/connect-api-examples/tree/master/connect-examples/v2/python_payment for more info
 
 ### Provide required credentials
 
