@@ -13,7 +13,7 @@ Tested with Angular 5.2+
 
 1. Add the payment form script to the header of your app (https://js.squareup.com/v2/paymentform) 
 
-2. Copy the ts code, and use either the HTML for it, or check out the [base HTML](https://github.com/square/connect-api-examples/blob/master/connect-examples/v2/python_payment/index.html)
+2. Copy the Typescript file, and use either the HTML for it. Or alternatively check out the [original HTML](https://github.com/square/connect-api-examples/blob/master/connect-examples/v2/python_payment/index.html) from Square
 
 3. Replace of modify the form action so it will hit the API you are using to store the info returned from square. 
 
