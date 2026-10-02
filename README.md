@@ -1,55 +1,74 @@
-# Square Payment processing example: Python Client; Angular Front End
+# Square Connect API · Angular snippet
 
-This sample demonstrates processing card payments with Square Connect API, using the
-Square Connect Python client library to capture the information, and Angular for the front end.
+A small standalone Angular card-payment example. “Square Connect” is the legacy
+name; new integrations use the [Web Payments SDK](https://developer.squareup.com/docs/web-payments/overview)
+to tokenize cards and the [Payments API](https://developer.squareup.com/reference/square/payments-api/create-payment)
+to charge them. No deprecated `SqPaymentForm`, Python backend, or Angular workspace included.
 
-## Requirements
+## Use in an Angular app
 
-Tested with Angular 5.2+
+Requires Angular 20+; uses signal inputs, signal state, and `afterNextRender`
+(browser-only SDK initialization, including in SSR apps).
 
-## Setup
+1. Install Square's TypeScript definitions:
+   ```sh
+   npm install --save-dev @square/web-payments-sdk-types
+   ```
+2. Copy `payment.component.ts` and `payment.component.html` into your app.
+3. Add the sandbox script from `index.html` to your app's `<head>`, before Angular
+   boots. The types package does **not** load the SDK. Keep your own app shell.
+4. Import `PaymentComponent` in your standalone parent component's `imports` and render:
+   ```html
+   <app-payment
+     applicationId="REPLACE_ME_SANDBOX_APPLICATION_ID"
+     locationId="REPLACE_ME_SANDBOX_LOCATION_ID"
+   />
+   ```
+   Get both IDs from the [Square Developer Console](https://developer.squareup.com/apps).
+   They are browser configuration; the **access token stays on the server**.
+5. Implement the endpoint below, then run `ng serve` **in your Angular app**, not
+   this snippet repository. Proxy `/api` to your backend if it runs on another port.
 
-### Using the Angular example
+This example charges **$1.00 USD**. `card.tokenize()` includes buyer verification
+(SCA); no separate `verifyBuyer()` call. Collect more billing contact information
+for a real checkout, and supply the server's order amount/currency to tokenization.
+Keep the SDK IDs stable for the lifetime of the component.
 
-1. Add the payment form script to the header of your app (https://js.squareup.com/v2/paymentform) 
+## Backend contract
 
-2. Copy the Typescript file, and use either the HTML for it. Or alternatively check out the [original HTML](https://github.com/square/connect-api-examples/blob/master/connect-examples/v2/python_payment/index.html) from Square
+`POST /api/payments` receives:
 
-3. Replace of modify the form action so it will hit the API you are using to store the info returned from square. 
+```json
+{ "sourceId": "TOKEN_FROM_SQUARE", "idempotencyKey": "UUID" }
+```
 
-### the Python client library example
+Your backend must call Square `CreatePayment` with `source_id`, `idempotency_key`,
+`amount_money: { amount: 100, currency: "USD" }`, and the same `location_id` used
+by the component. Authenticate with your **sandbox access token on the server**.
+Return `200` with `{ "status": "COMPLETED" }` only when Square reports completion;
+return a non-2xx response on failure. Tokenization alone does not charge a card.
 
-Checkout the original Python client library example at https://github.com/square/connect-api-examples/tree/master/connect-examples/v2/python_payment for more info
+For production, authenticate the checkout and derive the order, total, currency,
+and seller location server-side; never trust browser-supplied prices or secrets.
+Persist an idempotency key per order/payment attempt and reconcile an uncertain
+result before retrying. This minimal snippet creates a new key per submission;
+it is not an order/retry system. An HTTP/network failure does not prove that a
+charge failed. See Square's [server quickstart](https://developer.squareup.com/docs/web-payments/quickstart).
 
-### Provide required credentials
+## Sandbox and production
 
-The`Typescript` has values near the top of the file
-that you need to replace with various credentials associated with your application.
-If you're just testing things out, it's recommended that you use your _sandbox_
-credentials for now. See
-[this article](https://docs.connect.squareup.com/articles/using-sandbox/)
-for more information on the API sandbox.
+Use `http://localhost` for development, HTTPS for deployment, and Square's
+[Content Security Policy requirements](https://developer.squareup.com/docs/web-payments/content-security-policy).
+Test with `4111 1111 1111 1111`, CVV `111`, a future expiry, and US postal code
+`94103`; use only [sandbox test cards](https://developer.squareup.com/docs/devtools/sandbox/payments).
 
-You can `grep` for `REPLACE_ME` to find all of the fields to replace.
+For production, switch the script to `https://web.squarecdn.com/v1/square.js` and
+switch the application ID, seller location, backend API environment, and server
+access token together. **Production payments charge real cards.**
 
+## Verification
 
-## Running the sample
-
-From the sample's root directory, run:
-
-    ng serve
-
-You can then visit your dev instance of `localhost:4200` in your browser to see the card form.
-
-If you're using your sandbox credentials, you can test a valid credit card
-transaction by providing the following card information in the form:
-
-* Card Number 4532 7597 3454 5858
-* Card CVV 111
-* Card Expiration (Any time in the future)
-* Card Postal Code (Any valid US postal code)
-
-You can find more testing values in this [article](https://docs.connect.squareup.com/articles/using-sandbox)
-
-**Note that if you are _not_ using your sandbox credentials and you enter _real_
-credit card information, YOU WILL CHARGE THE CARD.**
+Compiled in a disposable Angular 22.2.1 app. Browser smoke checks used controlled
+SDK/backend responses for tokenization errors, cancellation, payment failure,
+pending/completed status, and component teardown. The real sandbox SDK loaded on
+`localhost` and rejected placeholder IDs; no end-to-end Square charge was run.
